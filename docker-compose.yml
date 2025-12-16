@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  api:
+    build: ./backend
+    ports:
+      - "5000:8080"  # Map port 8080 (container) ra 5000 (máy thật)
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=MyDb;User=sa;Password=YourStrong@Password;TrustServerCertificate=True;
+
+  web:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Password  # Mật khẩu SQL Server bắt buộc phải mạnh (Chữ hoa, thường, số, ký tự đặc biệt)
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:
